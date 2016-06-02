@@ -1,6 +1,32 @@
 #!/usr/bin/env python3
 
-banner = """
+bad_dog = """
+                              ,.  , 
+                          .-. \ \| \ 
+             ,---._    _,-.> `.\ \ ( 
+            (__,'  `   `>-         -\ 
+                     ,-'             `-. 
+         ,-'       ,  ,    .       .    `. 
+       ,'\       ,' ,-'    `-.      ;    :`. 
+      (__;     ,',,'      ,   `     : `. :  \ 
+             ,' |  _,'   /_    `    :  ; :   \ 
+            /  ,',' |   /  \        '     ;   \ 
+           /   | |(o|  /  (o)          |  |    ; 
+          /     ___-^-^-----.          |  |    | 
+         (   ,---. `-.           :.    |       : 
+          ;,'      )  `          :..   |        | 
+          :\      /              :.    |        ; 
+          :.`-.__,              ,:`    |        | 
+          ;`.    .             ':'      \      , 
+         /   `-.__\           '      ,   \     \. 
+        (   ,'    \`--,-----.       /     \     \`. 
+         `-'       \,' ,'   /    / |       \     | `. 
+                   /  '   ,'    /-.|        `.   ;   `. 
+                  (      /`----'   |          `--'     ` 
+                   `.__,' 
+"""
+
+good_dog = """
 
                                          do. 
                                         :NOX 
@@ -49,7 +75,7 @@ banner = """
   N@NOO;:oO;O:NMMM@M@OO@NOO;O;oOOXN@NNM@@'   `Y@NM@@@@MMNNMM@MM 
   ::@MOO;oO:::OXNM@@MXOM@OOOOOOXNMMNNNMNP      ""MNNM@@@MMMM@MP 
     @@@XOOO':::OOXXMNOO@@OOOOXNN@NNNNNNNN        '`YMM@@@MMM@P' 
-    MM@@M:'''' O:":ONOO@MNOOOOXM@NM@NNN@P  -hrr-     "`"'"MM' 
+    MM@@M:'''' O:":ONOO@MNOOOOXM@NM@NNN@P            "`"'"MM' 
     ''MM@:     "' 'OOONMOYOOOOO@MM@MNNM" 
       YM@'         :OOMN: :OOOO@MMNOXM' 
       `:P           :oP''  "'OOM@NXNM' 
@@ -57,5 +83,22 @@ banner = """
                                '"' 
 """
 
-import ssl
-from cryptography.fernet import Fernet
+import hmac
+from pyfiglet import Figlet
+# TODO ncurses
+
+def banner_open(fig):
+    print(good_dog)
+    print(fig.renderText('OPEN'))
+
+def banner_close(fig):
+    print(bad_dog)
+    print(fig.renderText('CLOSED'))
+
+if __name__ == '__main__':
+    import os
+    fig = Figlet(font='doh', width=300)
+    banner_open(fig)
+    os.system("sleep 3")
+    os.system("clear")
+    banner_close(fig)
