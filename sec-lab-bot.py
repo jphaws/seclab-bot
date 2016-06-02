@@ -1,104 +1,35 @@
 #!/usr/bin/env python3
 
-bad_dog = """
-                              ,.  , 
-                          .-. \ \| \ 
-             ,---._    _,-.> `.\ \ ( 
-            (__,'  `   `>-         -\ 
-                     ,-'             `-. 
-         ,-'       ,  ,    .       .    `. 
-       ,'\       ,' ,-'    `-.      ;    :`. 
-      (__;     ,',,'      ,   `     : `. :  \ 
-             ,' |  _,'   /_    `    :  ; :   \ 
-            /  ,',' |   /  \        '     ;   \ 
-           /   | |(o|  /  (o)          |  |    ; 
-          /     ___-^-^-----.          |  |    | 
-         (   ,---. `-.           :.    |       : 
-          ;,'      )  `          :..   |        | 
-          :\      /              :.    |        ; 
-          :.`-.__,              ,:`    |        | 
-          ;`.    .             ':'      \      , 
-         /   `-.__\           '      ,   \     \. 
-        (   ,'    \`--,-----.       /     \     \`. 
-         `-'       \,' ,'   /    / |       \     | `. 
-                   /  '   ,'    /-.|        `.   ;   `. 
-                  (      /`----'   |          `--'     ` 
-                   `.__,' 
-"""
-
-good_dog = """
-
-                                         do. 
-                                        :NOX 
-                                       ,NOM@: 
-                                       :NNNN: 
-                                       :XXXON 
-                                       :XoXXX. 
-                                       MM;ONO: 
-  .oob..                              :MMO;MOM 
- dXOXYYNNb.                          ,NNMX:MXN 
- Mo"'  '':Nbb                        dNMMN MNN: 
- Mo  'O;; ':Mb.                     ,MXMNM MNX: 
- @O :;XXMN..'X@b.                  ,NXOMXM MNX: 
- YX;;NMMMM@M;;OM@o.                dXOOMMN:MNX: 
- 'MOONM@@@MMN:':NONb.            ,dXONM@@MbMXX: 
-  MOON@M@@MMMM;;:OOONb          ,MX'"':ONMMMMX: 
-  :NOOM@@MNNN@@X;""XNN@Mb     .dP"'   ,..OXM@N: 
-   MOON@@MMNXXMMO  :M@@M...@o.oN"'":OOOXNNXXOo:
-   :NOX@@@MNXXXMNo :MMMM@K"`,:;NNM@@NXM@MNO;.'N. 
-    NO:X@@MNXXX@@O:'X@@@@MOOOXMM@M@NXXN@M@NOO ''b 
-    `MO.'NMNXXN@@N: 'XXM@NMMXXMM@M@XO"'"XM@X;.  :b 
-     YNO;'"NXXXX@M;;::"XMNN:""ON@@MO: ,;;.:Y@X: :OX. 
-      Y@Mb;;XNMM@@@NO: ':O: 'OXN@@MO" ONMMX:`XO; :X@. 
-      '@XMX':OX@@MN:    ;O;  :OX@MO" 'OMM@N; ':OO;N@N 
-       YN;":.:OXMX"': ,:NNO;';XMMX:  ,;@@MNN.'.:O;:@X: 
-       `@N;;XOOOXO;;:O;:@MOO;:O:"" ,oMP@@K"YM.;NMO;`NM 
-        `@@MN@MOX@@MNMN;@@MNXXOO: ,d@NbMMP'd@@OX@NO;.'bb. 
-       .odMX@@XOOM@M@@XO@MMMMMMNNbN"YNNNXoNMNMO"OXXNO.."";o. 
-     .ddMNOO@@XOOM@@XOONMMM@@MNXXMMo;."' .":OXO ':.'"'"'  '""o. 
-    'N@@X;,M@MXOOM@OOON@MM@MXOO:":ONMNXXOXX:OOO               ""ob. 
-   ')@MP"';@@XXOOMMOOM@MNNMOO""   '"OXM@MM: :OO.        :...';o;.;Xb. 
-  .@@MX" ;X@@XXOOM@OOXXOO:o:'      :OXMNO"' ;OOO;.:     ,OXMOOXXXOOXMb 
- ,dMOo:  oO@@MNOON@N:::"      .    ,;O:""'  .dMXXO:    ,;OX@XO"":ON@M@ 
-:Y@MX:.  oO@M@NOXN@NO. ..: ,;;O;.       :.OX@@MOO;..   .OOMNMO.;XN@M@P 
-,MP"OO'  oO@M@O:ON@MO;;XO;:OXMNOO;.  ,.;.;OXXN@MNXO;.. oOX@NMMN@@@@@M: 
-`' "O:;;OON@@MN::XNMOOMXOOOM@@MMNXO:;XXNNMNXXXN@MNXOOOOOXNM@NM@@@M@MP 
-   :XN@MMM@M@M:  :'OON@@XXNM@M@MXOOdN@@@MM@@@@MMNNXOOOXXNNN@@M@MMMM"' 
-   .oNM@MM@ONO'   :;ON@@MM@MMNNXXXM@@@@M@PY@@MMNNNNNNNNNNNM@M@M@@P' 
-  ;O:OXM@MNOOO.   'OXOONM@MNNMMXON@MM@@b. 'Y@@@@@@@@@@@@@M@@MP"'" 
- ;O':OOXNXOOXX:   :;NMO:":NMMMXOOX@MN@@@@b.:M@@@M@@@MMM@"'"" 
- :: ;"OOOOOO@N;:  'ON@MO.'":""OOOO@@NNMN@@@. Y@@@MMM@@@@b 
- :;   ':O:oX@@O;;  ;O@@XO'   "oOOOOXMMNMNNN@MN""YMNMMM@@MMo. 
- :N:.   ''oOM@NMo.::OX@NOOo.  ;OOOXXNNNMMMNXNM@bd@MNNMMM@MM@bb 
-  @;O .  ,OOO@@@MX;;ON@NOOO.. ' ':OXN@NNN@@@@@M@@@@MNXNMM@MMM@, 
-  M@O;;  :O:OX@@M@NXXOM@NOO:;;:,;;ON@NNNMM'`"@@M@@@@@MXNMMMMM@N 
-  N@NOO;:oO;O:NMMM@M@OO@NOO;O;oOOXN@NNM@@'   `Y@NM@@@@MMNNMM@MM 
-  ::@MOO;oO:::OXNM@@MXOM@OOOOOOXNMMNNNMNP      ""MNNM@@@MMMM@MP 
-    @@@XOOO':::OOXXMNOO@@OOOOXNN@NNNNNNNN        '`YMM@@@MMM@P' 
-    MM@@M:'''' O:":ONOO@MNOOOOXM@NM@NNN@P            "`"'"MM' 
-    ''MM@:     "' 'OOONMOYOOOOO@MM@MNNM" 
-      YM@'         :OOMN: :OOOO@MMNOXM' 
-      `:P           :oP''  "'OOM@NXNM' 
-       `'                    ':OXNP' 
-                               '"' 
-"""
-
+import sys
 import hmac
+import curses
 from pyfiglet import Figlet
-# TODO ncurses
 
-def banner_open(fig):
-    print(good_dog)
-    print(fig.renderText('OPEN'))
+FIGLET_FONT = 'doh'
+FIGLET_WIDTH = 256
 
-def banner_close(fig):
-    print(bad_dog)
-    print(fig.renderText('CLOSED'))
+CLOSED = 0
+OPEN = 1
+
+def main(win):
+    fig = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
+    win.nodelay(1)
+    state = CLOSED
+    while True:          
+        try:                 
+            key = win.getkey()         
+            win.clear()
+            if state == CLOSED:
+                banner = fig.renderText('OPEN')
+            elif state == OPEN:
+                banner = fig.renderText('CLOSED')
+            win.addstr(banner)
+            state ^= 1
+        except KeyboardInterrupt:
+            return
+        except Exception as e:
+            # No input   
+            pass
 
 if __name__ == '__main__':
-    import os
-    fig = Figlet(font='doh', width=300)
-    banner_open(fig)
-    os.system("sleep 3")
-    os.system("clear")
-    banner_close(fig)
+    curses.wrapper(main)
