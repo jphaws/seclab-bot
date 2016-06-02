@@ -11,11 +11,28 @@ FIGLET_WIDTH = 256
 CLOSED = 0
 OPEN = 1
 
+class NetworkException(Exception):
+    pass
+
 def send_open_request():
-    pass # TODO
+    try:
+        pass # TODO
+    #except something assertion-related:
+        # raise NetworkException("Error response to open request")
+    except:
+        raise NetworkException("Failed to send open request")
+    finally:
+        pass # if connection: close()
 
 def send_close_request():
-    pass # TODO
+    try:
+        pass # TODO
+    #except something assertion-related:
+        # raise NetworkException("Error response to close request")
+    except:
+        raise NetworkException("Failed to send close request")
+    finally:
+        pass # if connection: close()
 
 """
         TODO
@@ -23,7 +40,6 @@ def send_close_request():
     * bold     *
     * color    *
     * requests *
-    * async    *
     ************
 """
 
@@ -36,11 +52,17 @@ def main(win):
             if key != -1:
                 win.clear()
                 if state == CLOSED:
-                    banner = fig.renderText('The Lab is\nOPEN :)')
-                    send_open_request()
+                    try:
+                        send_open_request()
+                        banner = fig.renderText('The Lab is\nOPEN :)')
+                    except NetworkException as e:
+                        print(e, file=sys.stderr)
                 elif state == OPEN:
-                    banner = fig.renderText('The Lab is\nCLOSED :(')
-                    send_close_request()
+                    try:
+                        send_close_request()
+                        banner = fig.renderText('The Lab is\nCLOSED :(')
+                    except NetworkException as e:
+                        print(e, file=sys.stderr)
                 win.addstr(banner)
                 state ^= 1
         except KeyboardInterrupt:
