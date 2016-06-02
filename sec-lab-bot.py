@@ -3,6 +3,7 @@
 import sys
 import hmac
 import curses
+from time import time
 from pyfiglet import Figlet
 
 FIGLET_FONT = 'doh'
@@ -14,25 +15,32 @@ OPEN = 1
 class NetworkException(Exception):
     pass
 
-def send_open_request():
-    try:
-        pass # TODO
-    #except something assertion-related:
-        # raise NetworkException("Error response to open request")
-    except:
-        raise NetworkException("Failed to send open request")
-    finally:
-        pass # if connection: close()
+def network_trycatch(reqtype="open"):
+    def decorator(fn):
+        def inner():
+            try:
+                # conn = connect()
+                fn(conn)
+            #except something assertion-related:
+                # raise NetworkException(' '.join(["Error response to", reqtype, "request"]))
+            except:
+                raise NetworkException(' '.join(["Failed to send", reqtype, "request"]))
+            finally:
+                pass # if conn: conn.close()
+        return inner
+    return decorator
 
-def send_close_request():
-    try:
-        pass # TODO
-    #except something assertion-related:
-        # raise NetworkException("Error response to close request")
-    except:
-        raise NetworkException("Failed to send close request")
-    finally:
-        pass # if connection: close()
+def timestamp():
+    """ Return an 8-byte timestamp in little-endian with second-resolution """
+    return int.to_bytes(time().__trunc__(), 8, 'little')
+
+@network_trycatch(reqtype="open")
+def send_open_request(conn=None):
+    pass # TODO
+
+@network_trycatch(reqtype="close")
+def send_close_request(conn=None):
+    pass # TODO
 
 """
         TODO
