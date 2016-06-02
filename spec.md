@@ -8,6 +8,7 @@ Seclab Bot Protocol
 **Message Spec**
 
 The client will use python ssl to establish a TLS1.2 session with the server. It will use a custom SSL context which pins thewhitehat.club SSL certificate.
+(TODO: Modify thewhitehat.club Let's Encrypt certificate rotation script to also update the pinned cert, somehow)
 
 The client will receieve a 256-bit key K from the server.
 
