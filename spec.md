@@ -3,6 +3,8 @@ Seclab Bot Protocol
 
 **Message Spec**
 
+The client will establish a TLS1.2 connection with the server using python ssl with a custom SSL context which pins thewhitehat.club's certificate.
+
 The client will send the following message:
 
 ```
