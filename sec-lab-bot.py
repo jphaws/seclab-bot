@@ -57,3 +57,5 @@ banner = """
                                '"' 
 """
 
+import ssl
+from cryptography.fernet import Fernet
