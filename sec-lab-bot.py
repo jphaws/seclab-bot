@@ -46,6 +46,7 @@ def send_close_request():
 def main(win):
     fig = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
     state = CLOSED
+    win.addstr("Any key to toggle, Control-c to quit")
     while True:          
         try:                 
             key = win.getch()         
