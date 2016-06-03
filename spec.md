@@ -16,3 +16,9 @@ The client will send the following message:
 python hmac will be used with SHA-256.
 
 The HMAC will be keyed with a pre-shared secret 256-bit key, thus message validation will prove the sender knew the key. No other threat model really matters.
+
+The server will simply disconnect on any error, or return an "all good" response on success.
+
+The server will send the following message:
+
+TBD
