@@ -43,7 +43,7 @@ SSL_CA_FILE = './pinned.pem'
 
 
 def ssl_wrap_socket(sock):
-    """ Takes a socket, spits out an SSL-enabled socket """
+    """ Takes a socket, spits out an SSL-enabled socket, using horrible security if connecting to localhost (testing) """
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     if DEBUG:
         context.check_hostname = False
@@ -52,6 +52,7 @@ def ssl_wrap_socket(sock):
         context.verify_mode = ssl.CERT_REQUIRED
         context.check_hostname = True
         context.verify_flags = ssl.VERIFY_CRL_CHECK_CHAIN | ssl.VERIFY_CRL_CHECK_LEAF | ssl.VERIFY_X509_STRICT
+        context.load_verify_locations(capath=SSL_CA_FILE)
     context.set_ciphers(SSL_CIPHER_LIST)
     return context.wrap_socket(sock, server_hostname=SOCKET_HOST)
 
