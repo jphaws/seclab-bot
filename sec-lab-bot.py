@@ -21,6 +21,7 @@ FIGLET_WIDTH = 256
 
 fig = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
 
+
 OPEN_BANNER = fig.renderText('The Lab is\nOPEN :)'.strip())
 CLOSE_BANNER = fig.renderText('The Lab is\nCLOSED :('.strip())
 
@@ -33,13 +34,33 @@ STATE_CLOSED = 0
 STATE_OPEN = 1
 
 
-def network_trycatch(reqtype):
+DEBUG = True if SOCKET_HOST in ["localhost", "127.0.0.1"] else False
+
+
+SSL_CIPHER_LIST = "AES256:AESCCM:AESGCM:CHACHA20:SUITEB128:SUITEB192" if not DEBUG else "ALL"
+
+
+def ssl_wrap_socket(sock):
+    """ Takes a socket, spits out an SSL-enabled socket """
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+    if DEBUG:
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+    else:
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.check_hostname = True
+        context.verify_flags = ssl.VERIFY_CRL_CHECK_CHAIN | ssl.VERIFY_CRL_CHECK_LEAF | ssl.VERIFY_X509_STRICT
+    context.set_ciphers(SSL_CIPHER_LIST)
+    return context.wrap_socket(sock, server_hostname=SOCKET_HOST)
+
+
+def ssl_request(reqtype):
     """ Takes a request type (open/close) and returns a decorator """
     def decorator(fn):
-        """ Takes a function and calls it, wrapped in try/catch, given a connection object """
+        """ Takes a function and calls it, wrapped in try/catch, given an SSL connection """
         def inner():
             try:
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as conn:
+                with ssl_wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as conn:
                     conn.connect((SOCKET_HOST, SOCKET_PORT))
                     fn(conn)
             except Exception as e:
@@ -58,14 +79,14 @@ def log(s):
     return "[" + time.asctime() + "] " + s
 
 
-@network_trycatch("open")
+@ssl_request("open")
 def send_open_request(conn=None):
     """ Send an 'OPEN' request to the server """
     logging.info(log("client sent open request"))
     conn.sendall(log("Hello, World! I'm open!\n").encode())
 
 
-@network_trycatch("close")
+@ssl_request("close")
 def send_close_request(conn=None):
     """ Send a 'CLOSE' request to the server """
     logging.info(log("client sent close request"))
