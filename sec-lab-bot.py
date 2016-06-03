@@ -9,6 +9,10 @@ import curses
 import socket
 import logging
 from pyfiglet import Figlet
+from base64 import b64decode
+
+
+KEY_FILE = './psk.b64'
 
 
 LOG_FILE = './client.log'
@@ -34,12 +38,24 @@ STATE_CLOSED = 0
 STATE_OPEN = 1
 
 
+OPEN_REQ_FLAG = 0xff
+CLOSE_REQ_FLAG = 0x00
+
+
 DEBUG = True if SOCKET_HOST in ["localhost", "127.0.0.1"] else False
 
 
 SSL_CIPHER_LIST = "AES256:AESCCM:AESGCM:CHACHA20:SUITEB128:SUITEB192" if not DEBUG else "ALL"
 
 SSL_CA_FILE = './pinned.pem'
+
+
+def get_key():
+    with open(KEY_FILE, 'rb') as f:
+        return b64decode(f.read())
+
+
+KEY = get_key()
 
 
 def ssl_wrap_socket(sock):
@@ -58,18 +74,14 @@ def ssl_wrap_socket(sock):
 
 
 def ssl_request(reqtype):
-    """ Takes a request type (open/close) and returns a decorator """
-    def decorator(fn):
-        """ Takes a function and calls it, wrapped in try/catch, given an SSL connection """
-        def inner():
-            try:
-                with ssl_wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as conn:
-                    conn.connect((SOCKET_HOST, SOCKET_PORT))
-                    fn(conn)
-            except Exception as e:
-                logging.warning(log(str(e)))
-        return inner
-    return decorator
+    """ Takes a request type (open/close) and makes the request """
+    logging.info(log("client sent " + reqtype + " request"))
+    try:
+        with ssl_wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as conn:
+            conn.connect((SOCKET_HOST, SOCKET_PORT))
+            conn.sendall(make_request(reqtype))
+    except Exception as e:
+        logging.warning(log(str(e) + " during " + reqtype + " request"))
 
 
 def timestamp():
@@ -82,18 +94,17 @@ def log(s):
     return "[" + time.asctime() + "] " + s
 
 
-@ssl_request("open")
-def send_open_request(conn=None):
-    """ Send an 'OPEN' request to the server """
-    logging.info(log("client sent open request"))
-    conn.sendall(log("Hello, World! I'm open!\n").encode())
-
-
-@ssl_request("close")
-def send_close_request(conn=None):
-    """ Send a 'CLOSE' request to the server """
-    logging.info(log("client sent close request"))
-    conn.sendall(log("Hello, World! I'm closed.\n").encode())
+def make_request(reqtype):
+    data = b""
+    val = None
+    if reqtype == "open":
+        val = OPEN_REQ_FLAG
+    elif reqtype == "close":
+        val = CLOSE_REQ_FLAG
+    data += int.to_bytes(val, 1, 'little', signed=False)
+    data += timestamp()
+    data += hmac.new(KEY, msg=data, digestmod=hashlib.sha256).digest()
+    return data
 
 
 def main(win):

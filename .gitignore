@@ -1,4 +1,8 @@
+# python stuff
 venv/
 *.py[c|o]
 __pycache__/
 *.log
+
+# pre-shared key
+psk.b64
