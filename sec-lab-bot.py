@@ -11,9 +11,9 @@ import hashlib
 from pyfiglet import Figlet
 from base64 import b64decode as b64d, b64encode as b64e
 
-KEY_FILE = './psk.b64'
+KEY_FILE = 'files/psk.b64'
 
-LOG_FILE = './client.log'
+LOG_FILE = 'files/client.log'
 MAX_LOG_ENTRIES = 1024
 
 FIGLET_FONT = 'doh'
@@ -45,7 +45,7 @@ DEBUG = False if SOCKET_HOST not in ["localhost", "127.0.0.1"] else True
 
 SSL_CIPHER_LIST =\
 "AES256:AESCCM:AESGCM:CHACHA20:SUITEB128:SUITEB192" if not DEBUG else "ALL"
-SSL_CA_FILE = './pinned.pem'
+SSL_CA_FILE = 'files/pinned.pem'
 
 
 def read_key_from_file():
