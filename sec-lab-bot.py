@@ -49,7 +49,7 @@ def network_trycatch(reqtype):
 
 
 def timestamp():
-    """ 8-byte timestamp for the request """
+    """ 8-byte timestamp for the request (for freshness) """
     return int.to_bytes(time().__trunc__(), 8, 'little', signed=True)
 
 
