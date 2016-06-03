@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 import sys
 import ssl
 import hmac
@@ -10,7 +11,10 @@ import logging
 from pyfiglet import Figlet
 
 
-logging.basicConfig(filename='client.log', level=logging.DEBUG)
+LOG_FILE = './client.log'
+
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
+
 
 FIGLET_FONT = 'doh'
 FIGLET_WIDTH = 256
@@ -83,7 +87,7 @@ def main(win):
     
     while True:          
         try:                 
-            key = win.getch()
+            key = win.getch() # block for keypress
             win.clear()
             if state == STATE_CLOSED:
                 send_open_request()
