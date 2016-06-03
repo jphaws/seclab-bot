@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import ssl
 import hmac
 import time
 import curses
