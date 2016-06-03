@@ -31,7 +31,6 @@ def network_trycatch(reqtype="open"):
     return decorator
 
 def timestamp():
-    """ Return an 8-byte timestamp in little-endian with second-resolution """
     return int.to_bytes(time().__trunc__(), 8, 'little')
 
 @network_trycatch(reqtype="open")
@@ -63,15 +62,17 @@ def main(win):
                 if state == CLOSED:
                     try:
                         send_open_request()
-                        banner = fig.renderText('The Lab is\nOPEN :)')
                     except NetworkException as e:
                         print(e, file=sys.stderr)
+                    finally:
+                        banner = fig.renderText('The Lab is\nOPEN :)')
                 elif state == OPEN:
                     try:
                         send_close_request()
-                        banner = fig.renderText('The Lab is\nCLOSED :(')
                     except NetworkException as e:
                         print(e, file=sys.stderr)
+                    finally:
+                        banner = fig.renderText('The Lab is\nCLOSED :(')
                 win.addstr(banner)
                 state ^= 1
         except KeyboardInterrupt:
