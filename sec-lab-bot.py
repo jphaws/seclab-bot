@@ -45,7 +45,7 @@ def network_trycatch(reqtype):
 
 def timestamp():
     """ 8-byte timestamp for the request """
-    return int.to_bytes(time().__trunc__(), 8, 'little')
+    return int.to_bytes(time().__trunc__(), 8, 'little', signed=True)
 
 
 def log(s):
