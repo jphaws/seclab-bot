@@ -119,15 +119,11 @@ def ssl_request(reqtype):
                 if wire_decode_int(conn.recv(1)) != FLAG_ALL_GOOD:
                     raise Exception("client received bad response")
             elif reqtype in ["keygen"]:
-                data = conn.recv(1)
-                if wire_decode_int(data) != FLAG_KEYGEN_ACK:
-                    logging.warning(log("client received bad response"))
-                    return
-                tdata = conn.recv(8)
-                if not timestamp_verify(tdata):
-                    logging.warning(log("client received stale response"))
-                    return
-                write_key_to_file(conn.recv(64))
+                if wire_decode_int(conn.recv(1)) != FLAG_KEYGEN_ACK:
+                    raise Exception("client received bad response")
+                if not timestamp_verify(conn.recv(8)):
+                    raise Exception("client received stale response")
+                write_key_to_file(conn.recv(32))
         return EXIT_SUCCESS
     except Exception as e:
         logging.warning(log(str(e) + " during " + reqtype + " request"))
