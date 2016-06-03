@@ -39,6 +39,8 @@ DEBUG = True if SOCKET_HOST in ["localhost", "127.0.0.1"] else False
 
 SSL_CIPHER_LIST = "AES256:AESCCM:AESGCM:CHACHA20:SUITEB128:SUITEB192" if not DEBUG else "ALL"
 
+SSL_CA_FILE = './pinned.pem'
+
 
 def ssl_wrap_socket(sock):
     """ Takes a socket, spits out an SSL-enabled socket """
