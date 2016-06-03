@@ -8,8 +8,9 @@ import time
 import curses
 import socket
 import logging
+import hashlib
 from pyfiglet import Figlet
-from base64 import b64decode
+from base64 import b64decode as b64dec, b64encode as b64enc
 
 
 KEY_FILE = './psk.b64'
@@ -38,8 +39,17 @@ STATE_CLOSED = 0
 STATE_OPEN = 1
 
 
-OPEN_REQ_FLAG = 0xff
+OPEN_REQ_FLAG = 0xFF
 CLOSE_REQ_FLAG = 0x00
+KEYGEN_REQ_FLAG = 0xAA
+
+
+ALL_GOOD = 0xFF
+KEYGEN_ACK = 0x55
+
+
+EXIT_SUCCESS = 0
+EXIT_FAILURE = 1
 
 
 DEBUG = True if SOCKET_HOST in ["localhost", "127.0.0.1"] else False
@@ -50,12 +60,17 @@ SSL_CIPHER_LIST = "AES256:AESCCM:AESGCM:CHACHA20:SUITEB128:SUITEB192" if not DEB
 SSL_CA_FILE = './pinned.pem'
 
 
-def get_key():
+def read_key_from_file():
     with open(KEY_FILE, 'rb') as f:
-        return b64decode(f.read())
+        return b64dec(f.read())
 
 
-KEY = get_key()
+def write_key_to_file(key):
+    with open(KEY_FILE, 'wb') as f:
+        f.write(b64enc(key))
+
+
+KEY = read_key_from_file()
 
 
 def ssl_wrap_socket(sock):
@@ -74,24 +89,39 @@ def ssl_wrap_socket(sock):
 
 
 def ssl_request(reqtype):
-    """ Takes a request type (open/close) and makes the request """
+    """ Takes a request type (open/close/keygen) and makes the request """
     logging.info(log("client sent " + reqtype + " request"))
     try:
         with ssl_wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as conn:
             conn.connect((SOCKET_HOST, SOCKET_PORT))
             conn.sendall(make_request(reqtype))
+            if reqtype in ["open", "close"]:
+                if int.from_bytes(conn.recv(1), 'little') != ALL_GOOD:
+                    raise Exception("client received bad response")
+            elif reqtype in ["keygen"]:
+                data = conn.recv(1)
+                if int.from_bytes(data, 'little') != KEYGEN_ACK:
+                    logging.warning(log("client received bad response"))
+                    return
+                tdata = conn.recv(8)
+                if time.time().__trunc__() - int.from_bytes(tdata, 'little') > 10000:
+                    logging.warning(log("client received stale response"))
+                    return
+                write_key_to_file(conn.recv(64))
+        return EXIT_SUCCESS
     except Exception as e:
         logging.warning(log(str(e) + " during " + reqtype + " request"))
+        return EXIT_FAILURE
 
 
 def timestamp():
     """ 8-byte timestamp for the request (for freshness) """
-    return int.to_bytes(time().__trunc__(), 8, 'little', signed=True)
+    return int.to_bytes(time.time().__trunc__(), 8, 'little', signed=True)
 
 
 def log(s):
     """ Take a string and preprend a local timestamp for logging """
-    return "[" + time.asctime() + "] " + s
+    return "\t[" + time.asctime() + "]\t" + s
 
 
 def make_request(reqtype):
@@ -101,10 +131,20 @@ def make_request(reqtype):
         val = OPEN_REQ_FLAG
     elif reqtype == "close":
         val = CLOSE_REQ_FLAG
+    elif reqtype == "keygen":
+        val = KEYGEN_REQ_FLAG
     data += int.to_bytes(val, 1, 'little', signed=False)
     data += timestamp()
-    data += hmac.new(KEY, msg=data, digestmod=hashlib.sha256).digest()
+    mac = hmac.new(KEY, msg=data, digestmod=hashlib.sha256)
+    data += mac.digest()
     return data
+
+
+def ncurses_write(win, s):
+    try:
+        win.addstr(s, curses.A_BOLD)
+    except Exception as e:
+        logging.warning(str(e))
 
 
 def main(win):
@@ -119,25 +159,28 @@ def main(win):
     win.nodelay(0)
     win.addstr("Any key to toggle, Control-c to quit")
     win.refresh()
+    success = True
     
     while True:          
         try:                 
             key = win.getch() # block for keypress
             win.clear()
             if state == STATE_CLOSED:
-                send_open_request()
-                try:
-                    win.addstr(OPEN_BANNER, curses.A_BOLD)
-                except Exception as e:
-                    logging.warning(str(e))
+                if ssl_request("open") == EXIT_SUCCESS:
+                    ncurses_write(win, OPEN_BANNER)
+                    success = True
+                else:
+                    success = False
+                    logging.warning(log("open request failed"))
             elif state == STATE_OPEN:
-                send_close_request()
-                try:
-                    win.addstr(CLOSE_BANNER, curses.A_BOLD)
-                except Exception as e:
-                    logging.warning(str(e))
-
-            state ^= 1
+                if ssl_request("close") == EXIT_SUCCESS:
+                    ncurses_write(win, CLOSE_BANNER)
+                    success = True
+                else:
+                    success = False
+                    logging.warning(log("close request failed"))
+            if success:
+                state ^= 1
 
         except KeyboardInterrupt:
             logging.info(log("client exit"))
@@ -145,4 +188,6 @@ def main(win):
 
 
 if __name__ == '__main__':
+    if "--init" in sys.argv:
+        ssl_request("keygen")
     curses.wrapper(main)
