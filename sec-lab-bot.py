@@ -50,14 +50,20 @@ SSL_CA_FILE = './pinned.pem'
 
 def read_key_from_file():
     """ Read saved HMACing key """
-    with open(KEY_FILE, 'rb') as f:
-        return b64d(f.read())
+    try:
+        with open(KEY_FILE, 'rb') as f:
+            return b64d(f.read())
+    except:
+        logging.warning(log("error reading from key file"))
 
 
 def write_key_to_file(key):
     """ Write new HMACing key """
-    with open(KEY_FILE, 'wb') as f:
-        f.write(b64e(key))
+    try:
+        with open(KEY_FILE, 'wb') as f:
+            f.write(b64e(key))
+    except:
+        logging.warning(log("error writing to key file"))
 
 
 KEY = read_key_from_file()
@@ -216,9 +222,12 @@ def show_help():
 
 def truncate_log():
     """ Dump the log file if it's gotten too long """
-    with open(LOG_FILE, 'r+') as f:
-        if len(f.readlines()) > MAX_LOG_ENTRIES:
-            f.write("")
+    try:
+        with  open(LOG_FILE, 'r+') as f:
+            if len(f.readlines()) > MAX_LOG_ENTRIES:
+                f.write("")
+    except:
+        logging.warning(log("error truncating log file"))
 
 
 if __name__ == '__main__':
