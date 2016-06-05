@@ -54,7 +54,7 @@ def read_key_from_file():
         with open(KEY_FILE, 'rb') as f:
             return b64d(f.read())
     except:
-        logging.warning(log("error reading from key file"))
+        logging.warning(log_time("error reading from key file"))
 
 
 def write_key_to_file(key):
@@ -63,7 +63,7 @@ def write_key_to_file(key):
         with open(KEY_FILE, 'wb') as f:
             f.write(b64e(key))
     except:
-        logging.warning(log("error writing to key file"))
+        logging.warning(log_time("error writing to key file"))
 
 
 KEY = read_key_from_file()
@@ -114,7 +114,7 @@ def timestamp_verify(tdata):
 
 def ssl_request(reqtype):
     """ Takes a request type (open/close/keygen) and makes the request """
-    logging.info(log("client sent " + reqtype + " request"))
+    logging.info(log_time("client sent " + reqtype + " request"))
     try:
         with ssl_wrap_socket(
                 socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -132,11 +132,11 @@ def ssl_request(reqtype):
                 write_key_to_file(conn.recv(32))
         return EXIT_SUCCESS
     except Exception as e:
-        logging.warning(log(str(e) + " during " + reqtype + " request"))
+        logging.warning(log_time(str(e) + " during " + reqtype + " request"))
         return EXIT_FAILURE
 
 
-def log(s):
+def log_time(s):
     """ Take a string and preprend a local timestamp for logging """
     return "\t[" + time.asctime() + "]\t" + s
 
@@ -169,7 +169,7 @@ def ncurses_write(win, s):
 
 def main(win):
     """ ncurses loop, banner generation """
-    logging.info(log("client init"))
+    logging.info(log_time("client init"))
 
     state = STATE_CLOSED
 
@@ -195,15 +195,15 @@ def main(win):
                 if success:
                     ncurses_write(win, BANNER_CLOSE)
             if success:
-                logging.info(log(reqtype + " request success"))
+                logging.info(log_time(reqtype + " request success"))
                 state ^= 1
             else:
                 curses.flash()
                 curses.beep()
-                logging.warning(log(reqtype + " request failed"))
+                logging.warning(log_time(reqtype + " request failed"))
 
         except KeyboardInterrupt:
-            logging.info(log("client exit"))
+            logging.info(log_time("client exit"))
             return
 
 
@@ -227,7 +227,7 @@ def truncate_log():
             if len(f.readlines()) > MAX_LOG_ENTRIES:
                 f.write("")
     except:
-        logging.warning(log("error truncating log file"))
+        logging.warning(log_time("error truncating log file"))
 
 
 if __name__ == '__main__':
