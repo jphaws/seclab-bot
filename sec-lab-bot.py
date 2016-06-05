@@ -25,7 +25,7 @@ BANNER_CLOSE = FIGLET_Figlet.renderText('The Lab is\nCLOSED :('.strip())
 SOCKET_HOST = "127.0.0.1"
 SOCKET_PORT = 8080
 
-BYTE_ORDER = 'little' # endianness
+BYTE_ORDER = 'big' # endianness
 
 MAX_AGE = 10 # seconds
 
