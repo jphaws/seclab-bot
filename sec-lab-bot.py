@@ -168,7 +168,7 @@ def ncurses_write(win, s):
 
 
 def main(win):
-    """ ncurses loop, banner generation """
+    """ ncurses loop """
     logging.info(log_time("client init"))
 
     state = STATE_CLOSED
@@ -211,9 +211,9 @@ def show_help():
     print("SecLab Bot usage: python3 sec-lab-bot.py [--keygen]")
     print()
     print("The following files are required for operation:")
-    print("\tLOG_FILE\t[client.log]")
-    print("\tKEY_FILE\t[psk.b64]")
-    print("\tSSL_CERT_FILE\t[pinned.pem]")
+    print("\tLOG_FILE\t[files/client.log]")
+    print("\tKEY_FILE\t[files/psk.b64]")
+    print("\tSSL_CERT_FILE\t[files/pinned.pem]")
     print()
     print("The --keygen option will request a new PSK from the server")
     print()
