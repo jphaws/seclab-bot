@@ -43,9 +43,9 @@ EXIT_FAILURE = False
 
 DEBUG = False if SOCKET_HOST not in ["localhost", "127.0.0.1"] else True
 
-SSL_CIPHER_LIST =\
-"AES256:AESCCM:AESGCM:CHACHA20:SUITEB128:SUITEB192" if not DEBUG else "ALL"
 SSL_CA_FILE = 'files/pinned.pem'
+SSL_CIPHER_LIST =\
+"AESGCM:AESCCM:AES256:SUITEB192:SUITEB128:CHACHA20" if not DEBUG else "ALL"
 
 
 def read_key_from_file():
