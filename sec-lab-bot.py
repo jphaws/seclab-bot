@@ -41,7 +41,7 @@ STATE_OPEN = 1
 EXIT_SUCCESS = True
 EXIT_FAILURE = False
 
-DEBUG = False if SOCKET_HOST not in ["localhost", "127.0.0.1"] else True
+DEBUG = SOCKET_HOST in ["localhost", "127.0.0.1"]
 
 SSL_CA_FILE = 'files/pinned.pem'
 SSL_CIPHER_LIST =\
