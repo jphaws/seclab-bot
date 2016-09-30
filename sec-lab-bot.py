@@ -22,7 +22,7 @@ FIGLET_Figlet = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
 BANNER_OPEN = FIGLET_Figlet.renderText('The Lab is\nOPEN :)'.strip())
 BANNER_CLOSE = FIGLET_Figlet.renderText('The Lab is\nCLOSED :('.strip())
 
-SOCKET_HOST = "127.0.0.1"
+SOCKET_HOST = "127.0.0.1" # CHANGEME to WH Website Server
 SOCKET_PORT = 8080
 
 BYTE_ORDER = 'big' # endianness
@@ -54,7 +54,7 @@ def read_key_from_file():
         with open(KEY_FILE, 'rb') as f:
             return b64d(f.read())
     except:
-        logging.warning(log_time("error reading from key file"))
+        logging.warning("error reading from key file")
 
 
 def write_key_to_file(key):
@@ -63,7 +63,7 @@ def write_key_to_file(key):
         with open(KEY_FILE, 'wb') as f:
             f.write(b64e(key))
     except:
-        logging.warning(log_time("error writing to key file"))
+        logging.warning("error writing to key file")
 
 
 KEY = read_key_from_file()
@@ -71,7 +71,8 @@ KEY = read_key_from_file()
 
 def ssl_wrap_socket(sock):
     """ Takes a socket, spits out an SSL-enabled socket
-        using horrible security if connecting to localhost (testing) """
+        using horrible security if connecting to localhost (testing)
+    """
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     if DEBUG:
         context.check_hostname = False
@@ -114,7 +115,7 @@ def timestamp_verify(tdata):
 
 def ssl_request(reqtype):
     """ Takes a request type (open/close/keygen) and makes the request """
-    logging.info(log_time("client sent " + reqtype + " request"))
+    logging.info("client sent " + reqtype + " request")
     try:
         with ssl_wrap_socket(
                 socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -130,15 +131,12 @@ def ssl_request(reqtype):
                 if not timestamp_verify(conn.recv(8)):
                     raise Exception("client received stale response")
                 write_key_to_file(conn.recv(32))
+            else:
+                raise Exception("Unknown request type in ssl_request")
         return EXIT_SUCCESS
     except Exception as e:
-        logging.warning(log_time(str(e) + " during " + reqtype + " request"))
+        logging.warning(str(e) + " during " + reqtype + " request")
         return EXIT_FAILURE
-
-
-def log_time(s):
-    """ Take a string and preprend a local timestamp for logging """
-    return "\t[" + time.asctime() + "]\t" + s
 
 
 def make_request(reqtype):
@@ -151,6 +149,9 @@ def make_request(reqtype):
         val = FLAG_CLOSE_REQ
     elif reqtype == "keygen":
         val = FLAG_KEYGEN_REQ
+    else:
+        logging.error("Unknown request type in make_request")
+        raise ValueError
     data += wire_encode_int(val, 1, sgn=False)
     data += timestamp_bytes()
     mac = hmac.new(KEY, msg=data, digestmod=hashlib.sha256)
@@ -169,7 +170,7 @@ def ncurses_write(win, s):
 
 def main(win):
     """ ncurses loop """
-    logging.info(log_time("client init"))
+    logging.info("client init")
 
     state = STATE_CLOSED
 
@@ -199,15 +200,15 @@ def main(win):
                 if success:
                     ncurses_write(win, BANNER_CLOSE)
             if success:
-                logging.info(log_time(reqtype + " request success"))
+                logging.info(reqtype + " request success")
                 state ^= 1
             else:
                 curses.flash()
                 curses.beep()
-                logging.warning(log_time(reqtype + " request failed"))
+                logging.warning(reqtype + " request failed")
             gotchar = time.time()
         except KeyboardInterrupt:
-            logging.info(log_time("client exit"))
+            logging.info("client exit")
             return
 
 
@@ -227,7 +228,7 @@ def show_help():
 def truncate_log():
     """ Dump the log file if it's gotten too long """
     try:
-        with open(LOG_FILE, 'r+') as f:
+        with open(LOG_FILE, 'w+') as f:
             if len(f.readlines()) > MAX_LOG_ENTRIES:
                 f.write("")
         return True
@@ -244,7 +245,10 @@ if __name__ == '__main__':
         show_help()
         sys.exit(0)
     
-    logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)        
+    logging.basicConfig(filename=LOG_FILE,
+            format='[%(asctime)s] %(message)s',
+            datefmt='%m/%d/%Y %I:%M:%S %p',
+            level=logging.DEBUG)
 
     if "--keygen" in sys.argv:
         ssl_request("keygen")
