@@ -22,8 +22,8 @@ FIGLET_Figlet = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
 BANNER_OPEN = FIGLET_Figlet.renderText('The Lab is\nOPEN :)'.strip())
 BANNER_CLOSE = FIGLET_Figlet.renderText('The Lab is\nCLOSED :('.strip())
 
-SOCKET_HOST = "127.0.0.1" # CHANGEME to WH Website Server
-SOCKET_PORT = 8080
+SOCKET_HOST = "thewhitehat.club"
+SOCKET_PORT = 3737
 
 BYTE_ORDER = 'big' # endianness
 
