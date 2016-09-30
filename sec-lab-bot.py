@@ -181,10 +181,14 @@ def main(win):
     win.refresh()
     success = True
     
+    gotchar = 0
+    
     while True:          
         try:                 
             key = win.getch() # block for keypress
-            if state == STATE_CLOSED:
+            if time.time() - gotchar < 0.5:
+                continue
+            elif state == STATE_CLOSED:
                 reqtype = "open"
                 success = ssl_request(reqtype)
                 if success:
@@ -201,7 +205,7 @@ def main(win):
                 curses.flash()
                 curses.beep()
                 logging.warning(log_time(reqtype + " request failed"))
-
+            gotchar = time.time()
         except KeyboardInterrupt:
             logging.info(log_time("client exit"))
             return
@@ -223,15 +227,18 @@ def show_help():
 def truncate_log():
     """ Dump the log file if it's gotten too long """
     try:
-        with  open(LOG_FILE, 'r+') as f:
+        with open(LOG_FILE, 'r+') as f:
             if len(f.readlines()) > MAX_LOG_ENTRIES:
                 f.write("")
+        return True
     except:
-        logging.warning(log_time("error truncating log file"))
+        print("Error truncating log file")
+        return False
 
 
 if __name__ == '__main__':
-    truncate_log()
+    if not truncate_log():
+        sys.exit(1)
 
     if "-h" in sys.argv or "--help" in sys.argv:
         show_help()
