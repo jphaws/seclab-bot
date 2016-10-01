@@ -83,7 +83,7 @@ def ssl_wrap_socket(sock):
         context.verify_flags |= ssl.VERIFY_CRL_CHECK_CHAIN
         context.verify_flags |= ssl.VERIFY_CRL_CHECK_LEAF
         context.verify_flags |= ssl.VERIFY_X509_STRICT
-        context.load_verify_locations(capath=SSL_CA_FILE)
+        context.load_verify_locations(cafile=SSL_CA_FILE)
     context.set_ciphers(SSL_CIPHER_LIST)
     return context.wrap_socket(sock, server_hostname=SOCKET_HOST)
 
