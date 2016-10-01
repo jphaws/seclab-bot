@@ -42,6 +42,7 @@ EXIT_SUCCESS = True
 EXIT_FAILURE = False
 
 DEBUG = SOCKET_HOST in ["localhost", "127.0.0.1"]
+DEBUG = False
 
 SSL_CA_FILE = 'files/pinned.pem'
 SSL_CIPHER_LIST =\
@@ -80,8 +81,6 @@ def ssl_wrap_socket(sock):
     else:
         context.verify_mode = ssl.CERT_REQUIRED
         context.check_hostname = True
-        context.verify_flags |= ssl.VERIFY_CRL_CHECK_CHAIN
-        context.verify_flags |= ssl.VERIFY_CRL_CHECK_LEAF
         context.verify_flags |= ssl.VERIFY_X509_STRICT
         context.load_verify_locations(cafile=SSL_CA_FILE)
     context.set_ciphers(SSL_CIPHER_LIST)
