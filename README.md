@@ -3,6 +3,8 @@ Seclab Bot
 
 Making the White Hat Security Club Lab great again
 
+[![Lab Status](https://thewhitehat.club/status.svg)](https://thewhitehat.club/)
+
 Requirements (outside of python3-pip)
 -------------------------------------
 
