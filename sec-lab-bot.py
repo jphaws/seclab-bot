@@ -250,7 +250,13 @@ if __name__ == '__main__':
             level=logging.DEBUG)
 
     if "--keygen" in sys.argv:
-        ssl_request("keygen")
+        if ssl_request("keygen"):
+            logging.info("Key rotated")
+            sys.exit(0)
+        else:
+            logging.critical("Key rotate failed!")
+            sys.exit(1)
+
 
     curses.wrapper(main)
     logging.shutdown()
