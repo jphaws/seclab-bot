@@ -1,7 +1,14 @@
 Seclab Bot
 ==========
 
-Making the White Hat Security Club Lab great again
+Making the White Hat Security Club Lab
+
+Files
+-----
+* `client.log` contains logs of this bots activity
+* `pinned.pem` contains an SSL certificate chain
+to pin against (should be the cert chain for thewhitehat.club)
+* `psk.b64` containts the pre-shared key to use for signing and verifying messages to and from the server
 
 Requirements (outside of python3-pip)
 -------------------------------------

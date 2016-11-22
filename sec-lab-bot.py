@@ -29,6 +29,8 @@ BYTE_ORDER = 'big' # endianness
 
 MAX_AGE = 10 # seconds
 
+# Some magic numbers with pre-agreed meanings
+# for the server and client, AKA a protocl
 FLAG_OPEN_REQ = 0xFF
 FLAG_CLOSE_REQ = 0x00
 FLAG_KEYGEN_REQ = 0xAA
@@ -44,6 +46,7 @@ EXIT_FAILURE = False
 DEBUG = SOCKET_HOST in ["localhost", "127.0.0.1"]
 DEBUG = False
 
+# Pin TLS and only use good ciphers
 SSL_CA_FILE = 'files/pinned.pem'
 SSL_CIPHER_LIST =\
 "AESGCM:AESCCM:AES256:SUITEB192:SUITEB128:CHACHA20" if not DEBUG else "ALL"
@@ -103,7 +106,9 @@ def timestamp():
 
 
 def timestamp_bytes():
-    """ 8-byte timestamp for the request (for freshness) """
+    """ 8-byte timestamp for the request (for freshness)
+         keep at 8 bytes to avoid the 2038 problem
+    """
     return wire_encode_int(timestamp(), 8, sgn=True)
 
 
