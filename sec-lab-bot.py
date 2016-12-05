@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+""" SecLab Bot client """
 
 import sys
 import ssl
@@ -8,8 +9,8 @@ import curses
 import socket
 import logging
 import hashlib
-from pyfiglet import Figlet
 from base64 import b64decode as b64d, b64encode as b64e
+from pyfiglet import Figlet
 
 KEY_FILE = 'files/psk.b64'
 
@@ -18,16 +19,25 @@ MAX_LOG_ENTRIES = 1024
 
 FIGLET_FONT = 'doh'
 FIGLET_WIDTH = 256
-FIGLET_Figlet = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
-BANNER_OPEN = FIGLET_Figlet.renderText('The Lab is\nOPEN :)'.strip())
-BANNER_CLOSE = FIGLET_Figlet.renderText('The Lab is\nCLOSED :('.strip())
+FIGLET = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
+BANNER_OPEN = FIGLET.renderText('The Lab is\nOPEN :)'.strip())
+BANNER_CLOSE = FIGLET.renderText('The Lab is\nCLOSED :('.strip())
 
 SOCKET_HOST = "thewhitehat.club"
+#SOCKET_HOST = "localhost"
 SOCKET_PORT = 3737
 
-BYTE_ORDER = 'big' # endianness
+BYTE_ORDER = 'big'  # endianness
 
-MAX_AGE = 10 # seconds
+MAX_AGE = 10  # seconds
+
+
+class SecLabBotException(Exception):
+    """ Generic Exception
+        for SecLabBot-specific problems
+    """
+    pass
+
 
 # Some magic numbers with pre-agreed meanings
 # for the server and client, AKA a protocl
@@ -44,19 +54,18 @@ EXIT_SUCCESS = True
 EXIT_FAILURE = False
 
 DEBUG = SOCKET_HOST in ["localhost", "127.0.0.1"]
-DEBUG = False
 
 # Pin TLS and only use good ciphers
 SSL_CA_FILE = 'files/pinned.pem'
 SSL_CIPHER_LIST =\
-"AESGCM:AESCCM:AES256:SUITEB192:SUITEB128:CHACHA20" if not DEBUG else "ALL"
+ "AESGCM:AESCCM:AES256:SUITEB192:SUITEB128:CHACHA20" if not DEBUG else "ALL"
 
 
 def read_key_from_file():
     """ Read saved HMACing key """
     try:
-        with open(KEY_FILE, 'rb') as f:
-            return b64d(f.read())
+        with open(KEY_FILE, 'rb') as key_file:
+            return b64d(key_file.read())
     except:
         logging.warning("error reading from key file")
 
@@ -64,8 +73,8 @@ def read_key_from_file():
 def write_key_to_file(key):
     """ Write new HMACing key """
     try:
-        with open(KEY_FILE, 'wb') as f:
-            f.write(b64e(key))
+        with open(KEY_FILE, 'wb') as key_file:
+            key_file.write(b64e(key))
     except:
         logging.warning("error writing to key file")
 
@@ -122,24 +131,24 @@ def ssl_request(reqtype):
     logging.info("client sent " + reqtype + " request")
     try:
         with ssl_wrap_socket(
-                socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                            ) as conn:
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ) as conn:
             conn.connect((SOCKET_HOST, SOCKET_PORT))
             conn.sendall(make_request(reqtype))
             if reqtype in ["open", "close"]:
                 if wire_decode_int(conn.recv(1)) != FLAG_ALL_GOOD:
-                    raise Exception("client received bad response")
+                    raise SecLabBotException("client received bad response")
             elif reqtype in ["keygen"]:
                 if wire_decode_int(conn.recv(1)) != FLAG_KEYGEN_ACK:
-                    raise Exception("client received bad response")
+                    raise SecLabBotException("client received bad response")
                 if not timestamp_verify(conn.recv(8)):
-                    raise Exception("client received stale response")
+                    raise SecLabBotException("client received stale response")
                 write_key_to_file(conn.recv(32))
             else:
-                raise Exception("Unknown request type in ssl_request")
+                raise SecLabBotException("Unknown request type in ssl_request")
         return EXIT_SUCCESS
-    except Exception as e:
-        logging.warning(str(e) + " during " + reqtype + " request")
+    except Exception as exc:
+        logging.warning(str(exc) + " during " + reqtype + " request")
         return EXIT_FAILURE
 
 
@@ -163,13 +172,13 @@ def make_request(reqtype):
     return data
 
 
-def ncurses_write(win, s):
+def ncurses_write(win, msg):
     """ Takes an ncurses screen and a string and writes to the screen """
     try:
         win.clear()
-        win.addstr(s, curses.A_BOLD)
-    except Exception as e:
-        logging.warning(str(e))
+        win.addstr(msg, curses.A_BOLD)
+    except Exception as exc:
+        logging.warning("NCurses exception: " + str(exc))
 
 
 def main(win):
@@ -185,12 +194,12 @@ def main(win):
     win.addstr("Use any key to toggle, or control-c to quit")
     win.refresh()
     success = True
-    
+
     gotchar = 0
-    
-    while True:          
-        try:                 
-            key = win.getch() # block for keypress
+
+    while True:
+        try:
+            win.getch()  # block for keypress
             if time.time() - gotchar < 0.5:
                 continue
             elif state == STATE_CLOSED:
@@ -217,6 +226,7 @@ def main(win):
 
 
 def show_help():
+    """ Print help information """
     print("SecLab Bot usage: python3 sec-lab-bot.py [--keygen]")
     print()
     print("The following files are required for operation:")
@@ -226,15 +236,15 @@ def show_help():
     print()
     print("The --keygen option will request a new PSK from the server")
     print()
-    print("Use any key to toggle open/close, or control-c to quit") 
+    print("Use any key to toggle open/close, or control-c to quit")
 
 
 def truncate_log():
     """ Dump the log file if it's gotten too long """
     try:
-        with open(LOG_FILE, 'w+') as f:
-            if len(f.readlines()) > MAX_LOG_ENTRIES:
-                f.write("")
+        with open(LOG_FILE, 'w+') as log_file:
+            if len(log_file.readlines()) > MAX_LOG_ENTRIES:
+                log_file.write("")
         return True
     except:
         print("Error truncating log file")
@@ -248,11 +258,11 @@ if __name__ == '__main__':
     if "-h" in sys.argv or "--help" in sys.argv:
         show_help()
         sys.exit(0)
-    
+
     logging.basicConfig(filename=LOG_FILE,
-            format='[%(asctime)s] %(message)s',
-            datefmt='%m/%d/%Y %I:%M:%S %p',
-            level=logging.DEBUG)
+                        format='[%(asctime)s] %(message)s',
+                        datefmt='%m/%d/%Y %I:%M:%S %p',
+                        level=logging.DEBUG)
 
     if "--keygen" in sys.argv:
         if ssl_request("keygen"):
@@ -261,7 +271,6 @@ if __name__ == '__main__':
         else:
             logging.critical("Key rotate failed!")
             sys.exit(1)
-
 
     curses.wrapper(main)
     logging.shutdown()
