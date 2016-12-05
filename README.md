@@ -1,7 +1,7 @@
 Seclab Bot
 ==========
 
-Making the White Hat Security Club Lab
+The White Hat Security Club Lab bot
 
 Files
 -----
