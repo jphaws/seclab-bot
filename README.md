@@ -10,6 +10,8 @@ Files
 to pin against (should be the cert chain for thewhitehat.club)
 * `psk.b64` containts the pre-shared key to use for signing and verifying messages to and from the server
 
+[![Lab Status](https://thewhitehat.club/status.svg)](https://thewhitehat.club/)
+
 Requirements (outside of python3-pip)
 -------------------------------------
 
