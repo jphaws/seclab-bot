@@ -40,7 +40,7 @@ class SecLabBotException(Exception):
 
 
 # Some magic numbers with pre-agreed meanings
-# for the server and client, AKA a protocl
+# for the server and client, AKA a protocol
 FLAG_OPEN_REQ = 0xFF
 FLAG_CLOSE_REQ = 0x00
 FLAG_KEYGEN_REQ = 0xAA
