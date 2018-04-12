@@ -23,6 +23,11 @@ FIGLET = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
 BANNER_OPEN = FIGLET.renderText('The Lab is\nOPEN :)'.strip())
 BANNER_CLOSE = FIGLET.renderText('The Lab is\nCLOSED :('.strip())
 
+with open('coffee.txt', 'r') as f:
+    coffee = f.read()
+
+BANNER_COFFEE = FIGLET.renderText(('Out for\n').strip()) + coffee
+
 SOCKET_HOST = "thewhitehat.club"
 #SOCKET_HOST = "localhost"
 SOCKET_PORT = 3737
@@ -199,9 +204,14 @@ def main(win):
 
     while True:
         try:
-            win.getch()  # block for keypress
+            ch = win.getch()  # block for keypress
             if time.time() - gotchar < 0.5:
                 continue
+            if ch == ord('c') and state == STATE_OPEN: # coffee mode
+                reqtype = "close"
+                success = ssl_request(reqtype)
+                logging.info(ch)
+                ncurses_write(win, BANNER_COFFEE)
             elif state == STATE_CLOSED:
                 reqtype = "open"
                 success = ssl_request(reqtype)
