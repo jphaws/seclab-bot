@@ -18,10 +18,11 @@ LOG_FILE = 'files/client.log'
 MAX_LOG_ENTRIES = 1024
 
 FIGLET_FONT = 'doh'
-FIGLET_WIDTH = 256
+# FIGLET_WIDTH = 256
+FIGLET_WIDTH = 154
 FIGLET = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
-BANNER_OPEN = FIGLET.renderText('The Lab is\nOPEN :)'.strip())
-BANNER_CLOSE = FIGLET.renderText('The Lab is\nCLOSED :('.strip())
+BANNER_OPEN = FIGLET.renderText('The Lab is OPEN :)'.strip())
+BANNER_CLOSE = FIGLET.renderText('The Lab is CLOSED :('.strip())
 
 with open('coffee.txt', 'r') as f:
     coffee = f.read()
@@ -96,10 +97,7 @@ def ssl_wrap_socket(sock):
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
     else:
-        context.verify_mode = ssl.CERT_REQUIRED
-        context.check_hostname = True
-        context.verify_flags |= ssl.VERIFY_X509_STRICT
-        context.load_verify_locations(cafile=SSL_CA_FILE)
+        context.verify_mode = ssl.CERT_NONE
     context.set_ciphers(SSL_CIPHER_LIST)
     return context.wrap_socket(sock, server_hostname=SOCKET_HOST)
 
@@ -204,8 +202,10 @@ def main(win):
 
     while True:
         try:
+            if not truncate_log():
+                return
             ch = win.getch()  # block for keypress
-            if time.time() - gotchar < 0.5:
+            if time.time() - gotchar < 0.1:
                 continue
             if ch == ord('c') and state == STATE_OPEN: # coffee mode
                 reqtype = "close"
@@ -262,9 +262,6 @@ def truncate_log():
 
 
 if __name__ == '__main__':
-    if not truncate_log():
-        sys.exit(1)
-
     if "-h" in sys.argv or "--help" in sys.argv:
         show_help()
         sys.exit(0)
