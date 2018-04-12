@@ -21,8 +21,8 @@ FIGLET_FONT = 'doh'
 #FIGLET_WIDTH = 256
 FIGLET_WIDTH = 154
 FIGLET = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
-BANNER_OPEN = FIGLET.renderText('The Lab is OPEN :)'.strip())
-BANNER_CLOSE = FIGLET.renderText('The Lab is CLOSED :('.strip())
+BANNER_OPEN = FIGLET.renderText('Lab is OPEN :)'.strip())
+BANNER_CLOSE = FIGLET.renderText('Lab is CLOSED :('.strip())
 
 with open('coffee.txt', 'r') as f:
     coffee = f.read()
