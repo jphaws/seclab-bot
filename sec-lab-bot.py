@@ -164,7 +164,7 @@ def make_request(reqtype):
         val = FLAG_OPEN_REQ
     elif reqtype == "close":
         val = FLAG_CLOSE_REQ
-    elif reqtype == "coffee"
+    elif reqtype == "coffee":
         val = FLAG_COFFEE_REQ
     elif reqtype == "keygen":
         val = FLAG_KEYGEN_REQ
