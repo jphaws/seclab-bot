@@ -225,7 +225,10 @@ def main(win):
                 success = ssl_request(reqtype)
                 if success:
                     ncurses_write(win, BANNER_CLOSE)
-            if not success:
+            if success:
+                logging.info(reqtype + " request success")
+                state ^= 1
+            else:
                 curses.flash()
                 curses.beep()
                 logging.warning(reqtype + " request failed")
