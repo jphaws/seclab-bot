@@ -213,8 +213,8 @@ def main(win):
             if ch == ord('c') and state == STATE_OPEN: # coffee mode
                 reqtype = "coffee"
                 success = ssl_request(reqtype)
-                logging.info(ch)
-                ncurses_write(win, BANNER_COFFEE)
+                if success:
+                    ncurses_write(win, BANNER_COFFEE)
             elif state == STATE_CLOSED:
                 reqtype = "open"
                 success = ssl_request(reqtype)
@@ -225,10 +225,7 @@ def main(win):
                 success = ssl_request(reqtype)
                 if success:
                     ncurses_write(win, BANNER_CLOSE)
-            if success:
-                logging.info(reqtype + " request success")
-                state ^= 1
-            else:
+            if not success:
                 curses.flash()
                 curses.beep()
                 logging.warning(reqtype + " request failed")
