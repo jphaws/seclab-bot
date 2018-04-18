@@ -52,6 +52,7 @@ FLAG_CLOSE_REQ = 0x00
 FLAG_KEYGEN_REQ = 0xAA
 FLAG_ALL_GOOD = 0xFF
 FLAG_KEYGEN_ACK = 0x55
+FLAG_COFFEE_REQ = 0xCC
 
 STATE_CLOSED = 0
 STATE_OPEN = 1
@@ -138,7 +139,7 @@ def ssl_request(reqtype):
         ) as conn:
             conn.connect((SOCKET_HOST, SOCKET_PORT))
             conn.sendall(make_request(reqtype))
-            if reqtype in ["open", "close"]:
+            if reqtype in ["open", "close", "coffee"]:
                 if wire_decode_int(conn.recv(1)) != FLAG_ALL_GOOD:
                     raise SecLabBotException("client received bad response")
             elif reqtype in ["keygen"]:
@@ -163,6 +164,8 @@ def make_request(reqtype):
         val = FLAG_OPEN_REQ
     elif reqtype == "close":
         val = FLAG_CLOSE_REQ
+    elif reqtype == "coffee"
+        val = FLAG_COFFEE_REQ
     elif reqtype == "keygen":
         val = FLAG_KEYGEN_REQ
     else:
@@ -208,7 +211,7 @@ def main(win):
             if time.time() - gotchar < 0.1:
                 continue
             if ch == ord('c') and state == STATE_OPEN: # coffee mode
-                reqtype = "close"
+                reqtype = "coffee"
                 success = ssl_request(reqtype)
                 logging.info(ch)
                 ncurses_write(win, BANNER_COFFEE)
