@@ -23,6 +23,7 @@ FIGLET_WIDTH = 154
 FIGLET = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
 BANNER_OPEN = FIGLET.renderText('Lab is OPEN :)'.strip())
 BANNER_CLOSE = FIGLET.renderText('Lab is CLOSED :('.strip())
+BANNER_FIRE = FIGLET.renderText('Lab is FIRE'.strip())
 
 with open('coffee.txt', 'r') as f:
     coffee = f.read()
@@ -53,6 +54,7 @@ FLAG_KEYGEN_REQ = 0xAA
 FLAG_ALL_GOOD = 0xFF
 FLAG_KEYGEN_ACK = 0x55
 FLAG_COFFEE_REQ = 0xCC
+FLAG_FIRE_REQ = 0xFC
 
 STATE_CLOSED = 0
 STATE_OPEN = 1
@@ -139,7 +141,7 @@ def ssl_request(reqtype):
         ) as conn:
             conn.connect((SOCKET_HOST, SOCKET_PORT))
             conn.sendall(make_request(reqtype))
-            if reqtype in ["open", "close", "coffee"]:
+            if reqtype in ["open", "close", "coffee", "fire"]:
                 if wire_decode_int(conn.recv(1)) != FLAG_ALL_GOOD:
                     raise SecLabBotException("client received bad response")
             elif reqtype in ["keygen"]:
@@ -166,6 +168,8 @@ def make_request(reqtype):
         val = FLAG_CLOSE_REQ
     elif reqtype == "coffee":
         val = FLAG_COFFEE_REQ
+    elif reqtype == "fire":
+        val = FLAG_FIRE_REQ
     elif reqtype == "keygen":
         val = FLAG_KEYGEN_REQ
     else:
@@ -210,6 +214,11 @@ def main(win):
             ch = win.getch()  # block for keypress
             if time.time() - gotchar < 0.1:
                 continue
+            if ch == ord('f') and state == STATE_OPEN: # the lab is burning
+                reqtype = "fire"
+                success = ssl_request(reqtype)
+                if success:
+                    ncurses_write(win, BANNER_FIRE)
             if ch == ord('c') and state == STATE_OPEN: # coffee mode
                 reqtype = "coffee"
                 success = ssl_request(reqtype)
