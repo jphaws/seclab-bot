@@ -23,10 +23,14 @@ FIGLET_WIDTH = 154
 FIGLET = Figlet(font=FIGLET_FONT, width=FIGLET_WIDTH)
 BANNER_OPEN = FIGLET.renderText('Lab is OPEN :)'.strip())
 BANNER_CLOSE = FIGLET.renderText('Lab is CLOSED :('.strip())
-BANNER_FIRE = FIGLET.renderText('Lab is FIRE'.strip())
 
-with open('coffee.txt', 'r') as f:
-    coffee = f.read()
+with open('fire.txt', 'r') as f:
+    fire = f.read()
+
+BANNER_FIRE = FIGLET.renderText(('Lab is\n').strip()) + fire
+
+with open('coffee.txt', 'r') as c:
+    coffee = c.read()
 
 BANNER_COFFEE = FIGLET.renderText(('Out for\n').strip()) + coffee
 
