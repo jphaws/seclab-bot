@@ -219,7 +219,7 @@ def main(win):
                 success = ssl_request(reqtype)
                 if success:
                     ncurses_write(win, BANNER_FIRE)
-            if ch == ord('c') and state == STATE_OPEN: # coffee mode
+            elif ch == ord('c') and state == STATE_OPEN: # coffee mode
                 reqtype = "coffee"
                 success = ssl_request(reqtype)
                 if success:
