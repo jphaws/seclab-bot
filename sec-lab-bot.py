@@ -17,8 +17,8 @@ MAX_LOG_ENTRIES = 1024
 
 API_USER = os.environ.get("API_USER")
 API_PASS = os.environ.get("API_PASS")
-API_URL = "https://cpsecurity.club/api/v1/status"
-#API_URL = "http://localhost:3000/api/v1/status"
+#API_URL = "https://cpsecurity.club/api/v1/status"
+API_URL = "http://localhost:3000/api/v1/status"
 
 FIGLET_FONT = 'doh'
 FIGLET_WIDTH = 154
@@ -107,6 +107,25 @@ def main(win):
                 success = api_request(reqtype)
                 if success:
                     ncurses_write(win, BANNER_COFFEE)
+            elif ch == ord('l') and state == STATE_OPEN:
+                curses.echo()
+                win.addstr(0, 0, "Status: ")
+                win.refresh()
+                reqtype = win.getstr(0, 8, 6)
+                win.addstr(1, 0, "Color: ")
+                win.refresh()
+                statcolor = win.getstr(1, 7, 6)
+                curses.noecho()
+                try:
+                    statcolor = statcolor.decode('utf-8')
+                    reqtype = reqtype.decode('utf-8')
+                except:
+                    success = False
+                if not reqtype or not statcolor:
+                    success = False
+                success = api_request(reqtype, statcolor)
+                if success:
+                    ncurses_write(win, FIGLET.renderText(f'Lab is {reqtype.upper()}'.strip()))
             elif state == STATE_CLOSED:
                 reqtype = "open"
                 success = api_request(reqtype)
