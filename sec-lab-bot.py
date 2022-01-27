@@ -17,8 +17,8 @@ MAX_LOG_ENTRIES = 1024
 
 API_USER = os.environ.get("API_USER")
 API_PASS = os.environ.get("API_PASS")
-#API_URL = "https://cpsecurity.club/api/v1/status"
-API_URL = "http://localhost:3000/api/v1/status"
+API_URL = "https://cpsecurity.club/api/v1/status"
+#API_URL = "http://localhost:3000/api/v1/status"
 
 FIGLET_FONT = 'doh'
 FIGLET_WIDTH = 154
